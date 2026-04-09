@@ -15,8 +15,8 @@ Started: April 2026
 
 | Day | Go Topic | System Design | Article to Read | Status |
 |-----|----------|---------------|-----------------|--------|
-| [Day 01](day01/README.md) | Variables, Types, Zero Values | What is Scalability? | "What is a distributed system?" — Martin Fowler | ✅ |
-| [Day 02](day02/README.md) | Functions, Multiple Return Values | Availability vs Reliability | "The Go Blog: Errors are values" — go.dev/blog | ✅ |
+| [Day 01](day01/README.md) | Variables, Types, Zero Values | What is Scalability? | [A Word on Scalability — All Things Distributed](https://www.allthingsdistributed.com/2006/03/a_word_on_scalability.html) | ✅ |
+| [Day 02](day02/README.md) | Functions, Multiple Return Values | Availability vs Reliability | [Errors are values — go.dev/blog](https://go.dev/blog/errors-are-values) | ✅ |
 | Day 03 | Control Flow: `if`, `for`, `switch` | Load Balancers — how traffic is distributed | "Go Tour: Flow control" — tour.golang.org |  |
 | Day 04 | Structs | DNS & How the internet resolves names | "The Go Blog: JSON and Go" — go.dev/blog |  |
 | Day 05 | Pointers | CDN — Content Delivery Networks | "Pointers vs Values in Go" — go.dev/doc/faq |  |
