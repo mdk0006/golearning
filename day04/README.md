@@ -1,5 +1,15 @@
 # Day 04 — Structs in Go
 
+---
+
+> **بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيم**
+>
+> **Al-'Aleem — العَلِيم — The All-Knowing**
+>
+> _Allah knows everything you are learning, every struggle, every line of code. Nothing is wasted. Begin with His name and trust the process._
+
+---
+
 ## What is a Struct?
 
 A struct is a collection of named fields grouped under one type. It's how Go models real-world data.
@@ -319,3 +329,9 @@ Route 53 failover routing + health checks solve the TTL problem:
 8. `return` needs a value, not a type name
 9. Lowercase variable names for locals; uppercase for exported identifiers
 10. Define methods on structs so formatting/behaviour is defined once and reused everywhere
+
+---
+
+> **Al-Fattah — الفَتَّاح — The Opener**
+>
+> _He opens doors of understanding for those who seek. You showed up today, you wrote the code, you debugged it yourself. That is the way. See you on Day 05._
