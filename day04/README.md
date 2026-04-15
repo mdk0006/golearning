@@ -10,6 +10,14 @@
 
 ---
 
+## Blog of the Day
+
+[JSON and Go — The Go Blog](https://go.dev/blog/json-and-go)
+
+Read this after completing the session. It covers how Go handles JSON encoding/decoding — directly relevant to structs since JSON maps onto struct fields. Preview of Day 15.
+
+---
+
 ## What is a Struct?
 
 A struct is a collection of named fields grouped under one type. It's how Go models real-world data.
