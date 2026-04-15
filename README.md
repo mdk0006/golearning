@@ -68,7 +68,7 @@ Started: April 2026
 - [x] Day 01 — Variables, Types, Zero Values
 - [x] Day 02 — Functions, Multiple Return Values
 - [x] Day 03 — Control Flow
-- [ ] Day 04 — Structs
+- [x] Day 04 — Structs
 - [ ] Day 05 — Pointers
 - [ ] Day 06 — Slices
 - [ ] Day 07 — Maps

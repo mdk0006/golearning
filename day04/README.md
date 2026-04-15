@@ -220,6 +220,93 @@ func main() {
 
 ---
 
+---
+
+## System Design: DNS — How the Internet Resolves Names
+
+You type `google.com` in a browser. Your computer doesn't know where that is. DNS translates that name into an IP address like `142.250.80.46`.
+
+Think of it as the phone book of the internet.
+
+---
+
+### The Lookup Chain
+
+```
+Your Browser
+    → DNS Resolver (your ISP or 8.8.8.8)
+        → Root Nameserver (who handles .com?)
+            → TLD Nameserver (who handles google.com?)
+                → Authoritative Nameserver (what's the IP for google.com?)
+                    → returns 142.250.80.46
+```
+
+**1. DNS Resolver** — your first stop. Usually your ISP or a public resolver (Cloudflare `1.1.1.1`, Google `8.8.8.8`). Checks its cache first.
+
+**2. Root Nameserver** — knows nothing about `google.com` but knows who handles `.com`. 13 root server clusters globally.
+
+**3. TLD Nameserver** — handles `.com`, `.io`, `.org`. Knows who the authoritative nameserver is for `google.com`.
+
+**4. Authoritative Nameserver** — the source of truth. Owned by the domain owner. Returns the actual IP.
+
+---
+
+### Caching & TTL
+
+Every DNS response includes a **TTL (Time To Live)** — how long to cache the answer in seconds.
+
+- High TTL = fewer lookups, faster, but slow to propagate changes
+- Low TTL = frequent lookups, but changes take effect quickly
+
+---
+
+### DNS Record Types
+
+| Record | Purpose | Example |
+|--------|---------|---------|
+| `A` | Maps hostname → IPv4 | `web-01 → 10.0.0.1` |
+| `AAAA` | Maps hostname → IPv6 | |
+| `CNAME` | Alias to another hostname | `www → google.com` |
+| `MX` | Mail server for a domain | |
+| `TXT` | Arbitrary text, used for verification | |
+| `NS` | Which nameservers are authoritative | |
+
+---
+
+### TTL & Incident Response
+
+**The problem:** TTL is 24 hours. You need to failover `api.yourcompany.com` to a new IP immediately. Clients who cached it won't see the change for up to 24 hours.
+
+**The fix (proactive):**
+1. Keep TTL low during normal operations — 300s (5 min) is common for critical records
+2. Before a planned failover, drop TTL to 60s
+3. Wait for the old TTL to expire so all clients pick up the new low TTL
+4. Then change the IP — propagates in 60s
+
+**The catch:** Lowering the TTL only helps *after* the old TTL expires. If TTL is 24h and you lower it now, clients who cached it an hour ago still have 23 hours left. You have to wait out the old TTL first.
+
+**Rule:** Lower TTL before you need it, not during the crisis.
+
+---
+
+### Route 53 Health Checks — Bypassing TTL Entirely
+
+Route 53 failover routing + health checks solve the TTL problem:
+- The resolver keeps checking your endpoint health
+- When the health check fails, Route 53 stops returning that IP immediately
+- No waiting on TTL — DNS-level failover without the cache problem
+
+---
+
+### SRE Relevance
+
+- **Route 53, Cloud DNS** — managed authoritative DNS with health-check-based routing
+- **Split-horizon DNS** — same name resolves to different IPs inside vs outside (e.g., inside k8s vs public)
+- **DNS-based load balancing** — return multiple IPs, client picks one
+- **Service discovery in k8s** — `my-service.my-namespace.svc.cluster.local` is just DNS
+
+---
+
 ## Key Takeaways
 
 1. Structs group related fields under one named type
