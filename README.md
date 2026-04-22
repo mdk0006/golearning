@@ -19,7 +19,7 @@ Started: April 2026
 | [Day 02](day02/README.md) | Functions, Multiple Return Values | Availability vs Reliability | [Errors are values — go.dev/blog](https://go.dev/blog/errors-are-values) | ✅ |
 | [Day 03](day03/README.md) | Control Flow: `if`, `for`, `switch` | Load Balancers — how traffic is distributed | [Go Tour: Flow Control](https://go.dev/tour/flowcontrol/1) | ✅ |
 | [Day 04](day04/README.md) | Structs | DNS & How the internet resolves names | [JSON and Go — go.dev/blog](https://go.dev/blog/json-and-go) | ✅ |
-| Day 05 | Pointers | CDN — Content Delivery Networks | "Pointers vs Values in Go" — go.dev/doc/faq |  |
+| [Day 05](day05/README.md) | Pointers | Kubernetes Controllers & the informer cache footgun | [Arrays, slices (and strings): The mechanics of 'append' — go.dev/blog](https://go.dev/blog/slices-intro) | ✅ |
 | Day 06 | Slices | Caching — Redis, in-memory, eviction policies | "Go Slices: usage and internals" — go.dev/blog |  |
 | Day 07 | Maps | Databases — SQL vs NoSQL, when to use which | "Go Maps in action" — go.dev/blog |  |
 | Day 08 | Error Handling | CAP Theorem — Consistency, Availability, Partition | "Error handling and Go" — go.dev/blog |  |
