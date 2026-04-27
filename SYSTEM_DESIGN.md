@@ -14,6 +14,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 05](#day-05--kubernetes-controllers--the-informer-cache) | Kubernetes Controllers & the Informer Cache | ✅ |
 | [Day 06](#day-06--caching--eviction-policies) | Caching — Redis, In-Memory, Eviction Policies | ✅ |
 | [Day 07](#day-07--sql-vs-nosql) | Databases — SQL vs NoSQL, When to Use Which | ✅ |
+| [Day 08](#day-08--cap-theorem) | CAP Theorem — Consistency, Availability, Partition Tolerance | ✅ |
 
 ---
 
@@ -313,5 +314,78 @@ Data lives in tables with a fixed schema. Rows relate to other rows via foreign 
 | Incident metadata (freeform notes, tags) | **MongoDB** | Variable structure per incident |
 
 In real SRE platforms (PagerDuty, Datadog, Grafana OnCall) you see exactly this pattern: PostgreSQL for source-of-truth definitions, Redis for hot operational state, a time-series store for history.
+
+---
+
+## Day 08 — CAP Theorem
+
+**Covered in:** [day08/README.md](day08/README.md)  
+**Reference:** [Error Handling and Go — The Go Blog](https://go.dev/blog/error-handling-and-go)
+
+Every distributed system that stores data makes a promise about three properties. CAP says you can only fully guarantee two at the same time.
+
+---
+
+### The Three Properties
+
+| Property | Guarantee |
+|----------|-----------|
+| **Consistency (C)** | Every read returns the most recent write — or an error. All nodes see the same data. |
+| **Availability (A)** | Every request gets a response — never an error. May return stale data. |
+| **Partition Tolerance (P)** | The system keeps operating even when network messages between nodes are lost. |
+
+**Partition tolerance is not optional.** In any real distributed system (cloud, multi-AZ, multi-region), network partitions happen. The real choice is between C and A when a partition occurs.
+
+---
+
+### CP vs AP
+
+**CP — Consistent + Partition Tolerant**
+During a partition, the system refuses to answer rather than risk returning stale data.
+
+```
+Partition occurs → Node B stops serving reads → returns error
+Stale data is never returned
+```
+
+Examples: etcd, Zookeeper, CockroachDB, HBase
+
+**AP — Available + Partition Tolerant**
+During a partition, the system keeps serving requests with potentially stale data.
+
+```
+Partition occurs → Node B serves from local copy → client gets a response (possibly stale)
+```
+
+Examples: Cassandra, DynamoDB (default), DNS, CouchDB
+
+---
+
+### Real-World Examples
+
+| System | CAP | Why |
+|--------|-----|-----|
+| etcd | CP | Kubernetes correctness — wrong state is worse than no state |
+| Cassandra | AP | Availability matters more than perfect consistency for metrics/logs |
+| PostgreSQL (single node) | CA | No partition — one machine |
+| DNS | AP | Always answers, may return stale until TTL expires |
+| Zookeeper | CP | Leader election — two nodes can't both think they're leader |
+
+---
+
+### PACELC Extension
+
+CAP only covers partition behaviour. PACELC adds: even with no partition (**E**lse), there's a trade-off between **L**atency and **C**onsistency. Quorum writes (3 of 5 replicas) are more consistent but slower than single-replica writes. Stronger consistency = higher latency, always.
+
+---
+
+### For an SRE Alerting System
+
+| Component | Choice | Reason |
+|-----------|--------|--------|
+| Alert rule definitions | **CP (PostgreSQL)** | Wrong rules = wrong pages |
+| Active alert dedup state | **AP (Redis)** | Duplicate alert acceptable; downtime is not |
+| Metrics time-series | **AP (Cassandra)** | A few seconds stale is fine |
+| On-call schedule | **CP (PostgreSQL)** | Two people can't both be primary on-call |
 
 ---
