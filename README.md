@@ -23,7 +23,7 @@ Started: April 2026
 | [Day 06](day06/README.md) | Slices | Caching — Redis, in-memory, eviction policies | "Go Slices: usage and internals" — go.dev/blog | ✅ |
 | [Day 07](day07/README.md) | Maps | Databases — SQL vs NoSQL, when to use which | "Go Maps in action" — go.dev/blog | ✅ |
 | [Day 08](day08/README.md) | Error Handling | CAP Theorem — Consistency, Availability, Partition | "Error handling and Go" — go.dev/blog | ✅ |
-| Day 09 | Interfaces | Message Queues — Kafka, SQS, async communication | "The Go Blog: Laws of Reflection" — go.dev/blog |  |
+| [Day 09](day09/README.md) | Interfaces | Message Queues — Kafka, SQS, async communication | "The Go Blog: Laws of Reflection" — go.dev/blog | ✅ |
 | Day 10 | Goroutines & Channels | Rate Limiting — token bucket, leaky bucket | "Concurrency is not parallelism" — go.dev/blog |  |
 
 ---
@@ -73,7 +73,7 @@ Started: April 2026
 - [x] Day 06 — Slices
 - [x] Day 07 — Maps
 - [x] Day 08 — Error Handling
-- [ ] Day 09 — Interfaces
+- [x] Day 09 — Interfaces
 - [ ] Day 10 — Goroutines & Channels
 
 ### Month 2

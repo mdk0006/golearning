@@ -15,6 +15,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 06](#day-06--caching--eviction-policies) | Caching — Redis, In-Memory, Eviction Policies | ✅ |
 | [Day 07](#day-07--sql-vs-nosql) | Databases — SQL vs NoSQL, When to Use Which | ✅ |
 | [Day 08](#day-08--cap-theorem) | CAP Theorem — Consistency, Availability, Partition Tolerance | ✅ |
+| [Day 09](#day-09--message-queues) | Message Queues — Kafka, SQS, Async Communication | ✅ |
 
 ---
 
@@ -387,5 +388,70 @@ CAP only covers partition behaviour. PACELC adds: even with no partition (**E**l
 | Active alert dedup state | **AP (Redis)** | Duplicate alert acceptable; downtime is not |
 | Metrics time-series | **AP (Cassandra)** | A few seconds stale is fine |
 | On-call schedule | **CP (PostgreSQL)** | Two people can't both be primary on-call |
+
+---
+
+## Day 09 — Message Queues
+
+**Covered in:** [day09/README.md](day09/README.md)  
+**Reference:** [The Go Blog: Laws of Reflection](https://go.dev/blog/laws-of-reflection)
+
+Message queues introduce **asynchronous** communication — producer writes a message and moves on immediately; consumer reads at its own pace.
+
+```
+Synchronous:  AlertManager → calls PagerDuty API → waits → response → done
+Async:        AlertManager → [Queue] → PagerDuty worker reads when ready
+```
+
+---
+
+### Kafka
+
+A **distributed log**. Messages are appended to a topic and retained for days/weeks. Consumers track their own offset — different services can read the same topic independently.
+
+**Key properties:**
+- Messages persist after being read — replayable
+- Multiple independent consumers per topic
+- Guaranteed ordering within a partition
+- Very high throughput — millions of messages/sec
+- You manage the brokers (ops burden)
+
+**SRE use cases:** audit logs, metrics pipelines, alert event streams, change event feeds
+
+---
+
+### SQS
+
+A **managed job queue**. Messages are deleted after a consumer acknowledges them. No replay.
+
+**Key properties:**
+- At-least-once delivery — design consumers to be idempotent
+- Visibility timeout — unacknowledged messages reappear for retry
+- Dead letter queue (DLQ) — messages that fail N times are moved for investigation
+- Fully managed — no brokers to operate
+
+**SRE use cases:** async task dispatch, decoupling microservices, triggering Lambda functions
+
+---
+
+### Kafka vs SQS
+
+| Property | Kafka | SQS |
+|----------|-------|-----|
+| Retention after read | Yes — days/weeks | No — deleted on ack |
+| Replay | Yes | No |
+| Multiple consumers | Yes — independent | No — one consumer per message |
+| Ordering | Guaranteed within partition | Best-effort |
+| Ops burden | High | None (managed) |
+
+---
+
+### Key Async Patterns
+
+**Fan-out:** one alert fires → Kafka topic → PagerDuty consumer + Slack consumer + DB consumer all run independently
+
+**Burst buffering:** 10,000 alerts → queue absorbs the spike → worker processes at 100/sec → downstream never overwhelmed
+
+**Retry + DLQ:** failed message reappears after visibility timeout → after N failures moves to DLQ → SRE investigates
 
 ---
