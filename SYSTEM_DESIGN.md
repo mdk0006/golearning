@@ -16,6 +16,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 07](#day-07--sql-vs-nosql) | Databases — SQL vs NoSQL, When to Use Which | ✅ |
 | [Day 08](#day-08--cap-theorem) | CAP Theorem — Consistency, Availability, Partition Tolerance | ✅ |
 | [Day 09](#day-09--message-queues) | Message Queues — Kafka, SQS, Async Communication | ✅ |
+| [Day 10](#day-10--rate-limiting) | Rate Limiting — Token Bucket, Leaky Bucket | ✅ |
 
 ---
 
@@ -453,5 +454,83 @@ A **managed job queue**. Messages are deleted after a consumer acknowledges them
 **Burst buffering:** 10,000 alerts → queue absorbs the spike → worker processes at 100/sec → downstream never overwhelmed
 
 **Retry + DLQ:** failed message reappears after visibility timeout → after N failures moves to DLQ → SRE investigates
+
+---
+
+## Day 10 — Rate Limiting
+
+**Covered in:** [day10/README.md](day10/README.md)  
+**Reference:** [Concurrency is not parallelism — The Go Blog](https://go.dev/blog/waza-talk)
+
+Rate limiting controls how many requests are allowed through per unit of time — protecting downstream services from being overwhelmed.
+
+---
+
+### Token Bucket
+
+A bucket holds tokens, refilled at a fixed rate. Each request consumes one token. Requests are rejected when the bucket is empty.
+
+```
+Refill rate: 10 tokens/sec
+Capacity:    20 tokens (max burst)
+
+Burst of 20 requests → all allowed (consume bucket)
+Next request → rejected (bucket empty)
+After 0.1s → 1 token refilled → next request allowed
+```
+
+- Allows bursts up to capacity
+- Steady-state capped at refill rate
+- Friendly to bursty-but-low-average traffic
+
+**SRE use cases:** API rate limiting per client, Alertmanager `rate`/`burst` config, Kubernetes API server throttling (client-go uses `rate.NewLimiter`)
+
+---
+
+### Leaky Bucket
+
+Requests pour in at any rate. They drain out at a fixed constant rate. Overflow is dropped immediately.
+
+```
+Drain rate: 10 req/sec
+Queue size: 20
+
+Burst of 50 arrives → 20 queued, 30 dropped
+Queue drains at exactly 10/sec regardless
+```
+
+- Output is perfectly constant — no bursts reach downstream
+- Best for protecting services that need smooth input
+
+---
+
+### Token Bucket vs Leaky Bucket
+
+| Property | Token Bucket | Leaky Bucket |
+|----------|-------------|--------------|
+| Burst handling | Allowed up to capacity | Absorbed up to queue, rest dropped |
+| Output rate | Variable | Perfectly constant |
+| Best for | API clients with bursty traffic | Protecting smooth-input downstreams |
+
+---
+
+### Sliding Window
+
+Count requests in a rolling time window. More accurate than fixed windows (which allow double the rate at boundaries). Used in Redis rate limiters (`INCR` + `EXPIRE`).
+
+---
+
+### In Go
+
+```go
+import "golang.org/x/time/rate"
+
+limiter := rate.NewLimiter(rate.Limit(10), 20)
+// 10 tokens/sec refill, 20 burst capacity
+
+if !limiter.Allow() {
+    // reject
+}
+```
 
 ---
