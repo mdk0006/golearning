@@ -20,11 +20,11 @@ Started: April 2026
 | [Day 03](day03/README.md) | Control Flow: `if`, `for`, `switch` | Load Balancers — how traffic is distributed | [Go Tour: Flow Control](https://go.dev/tour/flowcontrol/1) | ✅ |
 | [Day 04](day04/README.md) | Structs | DNS & How the internet resolves names | [JSON and Go — go.dev/blog](https://go.dev/blog/json-and-go) | ✅ |
 | [Day 05](day05/README.md) | Pointers | Kubernetes Controllers & the informer cache footgun | [Arrays, slices (and strings): The mechanics of 'append' — go.dev/blog](https://go.dev/blog/slices-intro) | ✅ |
-| [Day 06](day06/README.md) | Slices | Caching — Redis, in-memory, eviction policies | "Go Slices: usage and internals" — go.dev/blog | ✅ |
-| [Day 07](day07/README.md) | Maps | Databases — SQL vs NoSQL, when to use which | "Go Maps in action" — go.dev/blog | ✅ |
-| [Day 08](day08/README.md) | Error Handling | CAP Theorem — Consistency, Availability, Partition | "Error handling and Go" — go.dev/blog | ✅ |
-| [Day 09](day09/README.md) | Interfaces | Message Queues — Kafka, SQS, async communication | "The Go Blog: Laws of Reflection" — go.dev/blog | ✅ |
-| [Day 10](day10/README.md) | Goroutines & Channels | Rate Limiting — token bucket, leaky bucket | "Concurrency is not parallelism" — go.dev/blog | ✅ |
+| [Day 06](day06/README.md) | Slices | Caching — Redis, in-memory, eviction policies | [Go Slices: usage and internals — go.dev/blog](https://go.dev/blog/go-slices-usage-and-internals) | ✅ |
+| [Day 07](day07/README.md) | Maps | Databases — SQL vs NoSQL, when to use which | [Go Maps in Action — go.dev/blog](https://go.dev/blog/maps) | ✅ |
+| [Day 08](day08/README.md) | Error Handling | CAP Theorem — Consistency, Availability, Partition | [Error Handling and Go — go.dev/blog](https://go.dev/blog/error-handling-and-go) | ✅ |
+| [Day 09](day09/README.md) | Interfaces | Message Queues — Kafka, SQS, async communication | [The Laws of Reflection — go.dev/blog](https://go.dev/blog/laws-of-reflection) | ✅ |
+| [Day 10](day10/README.md) | Goroutines & Channels | Rate Limiting — token bucket, leaky bucket | [Concurrency is not parallelism — go.dev/blog](https://go.dev/blog/waza-talk) | ✅ |
 
 ---
 
@@ -32,7 +32,7 @@ Started: April 2026
 
 | Day | Go Topic | System Design | Article to Read | Status |
 |-----|----------|---------------|-----------------|--------|
-| [Day 11](day11/README.md) | Packages & Modules | API Gateway — single entry point pattern | "Organizing a Go module" — go.dev/doc | ✅ |
+| [Day 11](day11/README.md) | Packages & Modules | API Gateway — single entry point pattern | [Organizing a Go module — go.dev/doc](https://go.dev/doc/modules/layout) | ✅ |
 | Day 12 | File I/O | Monolith vs Microservices — trade-offs | "Microservices" — Martin Fowler |  |
 | Day 13 | HTTP Client | Service Discovery — how services find each other | "HTTP/2 in Go" — go.dev/blog |  |
 | Day 14 | HTTP Server | Load Balancer Deep Dive — L4 vs L7 | "Writing Web Apps in Go" — go.dev/doc |  |
