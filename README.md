@@ -32,7 +32,7 @@ Started: April 2026
 
 | Day | Go Topic | System Design | Article to Read | Status |
 |-----|----------|---------------|-----------------|--------|
-| Day 11 | Packages & Modules | API Gateway — single entry point pattern | "Organizing a Go module" — go.dev/doc |  |
+| [Day 11](day11/README.md) | Packages & Modules | API Gateway — single entry point pattern | "Organizing a Go module" — go.dev/doc | ✅ |
 | Day 12 | File I/O | Monolith vs Microservices — trade-offs | "Microservices" — Martin Fowler |  |
 | Day 13 | HTTP Client | Service Discovery — how services find each other | "HTTP/2 in Go" — go.dev/blog |  |
 | Day 14 | HTTP Server | Load Balancer Deep Dive — L4 vs L7 | "Writing Web Apps in Go" — go.dev/doc |  |
@@ -77,7 +77,7 @@ Started: April 2026
 - [x] Day 10 — Goroutines & Channels
 
 ### Month 2
-- [ ] Day 11 — Packages & Modules
+- [x] Day 11 — Packages & Modules
 - [ ] Day 12 — File I/O
 - [ ] Day 13 — HTTP Client
 - [ ] Day 14 — HTTP Server

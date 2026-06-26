@@ -17,6 +17,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 08](#day-08--cap-theorem) | CAP Theorem — Consistency, Availability, Partition Tolerance | ✅ |
 | [Day 09](#day-09--message-queues) | Message Queues — Kafka, SQS, Async Communication | ✅ |
 | [Day 10](#day-10--rate-limiting) | Rate Limiting — Token Bucket, Leaky Bucket | ✅ |
+| [Day 11](#day-11--api-gateway) | API Gateway — Single Entry Point Pattern | ✅ |
 
 ---
 
@@ -532,5 +533,82 @@ if !limiter.Allow() {
     // reject
 }
 ```
+
+---
+
+## Day 11 — API Gateway
+
+**Covered in:** [day11/README.md](day11/README.md)  
+**Reference:** [Organizing a Go module — go.dev/doc](https://go.dev/doc/modules/layout)
+
+An API Gateway is a single entry point that sits in front of all backend services. It handles cross-cutting concerns once so every service gets them for free.
+
+---
+
+### The Problem Without a Gateway
+
+Every service must implement auth, rate limiting, TLS, and logging independently. When auth logic changes, every service updates. No single place to observe all traffic.
+
+---
+
+### What a Gateway Does
+
+```
+Client → API Gateway → alerting-service
+                    → metrics-service
+                    → config-service
+```
+
+| Concern | Without gateway | With gateway |
+|---------|----------------|-------------|
+| Auth | Every service validates tokens | Gateway validates, backends trust |
+| Rate limiting | Every service implements it | One policy, one place |
+| TLS termination | Every service manages certs | Gateway only |
+| Routing | Clients know every service URL | Clients know one URL |
+| Logging | Scattered | Single access log |
+
+### Request Lifecycle
+
+```
+Client → Gateway checks rate limit → validates auth token
+       → routes /alerts to alerting-service
+       → alerting-service responds
+       → Gateway returns response (strips internal headers, adds correlation ID)
+```
+
+---
+
+### AWS ALB as an API Gateway
+
+ALB listener rules provide routing:
+```
+/api/alerts*  → alerting-service target group
+/api/metrics* → metrics-service target group
+```
+
+ALB + WAF (rate limiting, IP filtering) + Cognito/Lambda authorizer (auth) = full API Gateway without running your own software.
+
+---
+
+### Dedicated Gateways
+
+| Gateway | Used for |
+|---------|---------|
+| Kong | Plugin-based, on-prem or cloud |
+| Envoy | Service mesh sidecar + edge, used by Istio |
+| AWS API Gateway | Fully managed, serverless-native |
+| Traefik | Kubernetes-native, auto-discovers via labels |
+| Nginx | Simple reverse proxy for smaller setups |
+
+In Kubernetes — Ingress + Ingress Controller is the API Gateway for north-south traffic.
+
+---
+
+### When to Use
+
+- Multiple backend services behind one public URL → ✅ Gateway
+- Consistent auth across all services → ✅ Gateway
+- Single service, simple setup → ❌ Overkill
+- Service-to-service internal calls → ❌ Use service mesh instead
 
 ---
