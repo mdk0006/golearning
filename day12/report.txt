@@ -1,0 +1,4 @@
+web-01: OK
+web-02: OK
+db-01: OK
+db-02: OK

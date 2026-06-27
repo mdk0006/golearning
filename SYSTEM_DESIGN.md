@@ -18,6 +18,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 09](#day-09--message-queues) | Message Queues — Kafka, SQS, Async Communication | ✅ |
 | [Day 10](#day-10--rate-limiting) | Rate Limiting — Token Bucket, Leaky Bucket | ✅ |
 | [Day 11](#day-11--api-gateway) | API Gateway — Single Entry Point Pattern | ✅ |
+| [Day 12](#day-12--monolith-vs-microservices) | Monolith vs Microservices — Trade-offs | ✅ |
 
 ---
 
@@ -610,5 +611,58 @@ In Kubernetes — Ingress + Ingress Controller is the API Gateway for north-sout
 - Consistent auth across all services → ✅ Gateway
 - Single service, simple setup → ❌ Overkill
 - Service-to-service internal calls → ❌ Use service mesh instead
+
+---
+
+## Day 12 — Monolith vs Microservices
+
+**Covered in:** [day12/README.md](day12/README.md)  
+**Reference:** [Microservices — Martin Fowler](https://martinfowler.com/articles/microservices.html)
+
+Neither architecture is universally right. The choice depends on team size, domain maturity, and operational capacity.
+
+---
+
+### Monolith
+
+All features in one codebase, one binary, one deploy.
+
+**Strengths:** simple to develop and test, no network calls between components, easy cross-cutting changes, low operational overhead.
+
+**Weaknesses:** all-or-nothing scaling, one bad deploy affects everything, codebase grows into a "big ball of mud", technology lock-in.
+
+---
+
+### Microservices
+
+Each feature is a separate service deployed independently, communicating over the network.
+
+**Strengths:** scale components independently, isolated failures, independent deploys per team, technology freedom per service.
+
+**Weaknesses:** network latency and partial failures between services, distributed tracing required, high operational complexity (10 services = 10 pipelines, 10 log streams, 10 health checks).
+
+---
+
+### Trade-off Table
+
+| Factor | Monolith | Microservices |
+|--------|----------|--------------|
+| Development speed (early) | ✅ Fast | ❌ Slow setup |
+| Operational complexity | ✅ Low | ❌ High |
+| Independent scaling | ❌ No | ✅ Yes |
+| Fault isolation | ❌ One bug kills all | ✅ Contained |
+| Debugging | ✅ Simple | ❌ Needs distributed tracing |
+
+---
+
+### The Real Answer — Start Monolith, Split When It Hurts
+
+> "Don't start with microservices. Start with a monolith, understand the boundaries, then extract services where it actually helps." — Martin Fowler
+
+**Split when:** one component has very different scaling needs, teams are blocking each other's deploys, or one component needs a different technology.
+
+**Stay monolith when:** team is small, domain isn't well understood, or you can't afford the operational overhead.
+
+**SRE perspective:** microservices move complexity from code to infrastructure — more health checks, more tracing, more deployment pipelines. The SRE team feels this cost most.
 
 ---
