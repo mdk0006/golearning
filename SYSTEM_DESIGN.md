@@ -19,6 +19,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 10](#day-10--rate-limiting) | Rate Limiting — Token Bucket, Leaky Bucket | ✅ |
 | [Day 11](#day-11--api-gateway) | API Gateway — Single Entry Point Pattern | ✅ |
 | [Day 12](#day-12--monolith-vs-microservices) | Monolith vs Microservices — Trade-offs | ✅ |
+| [Day 13](#day-13--service-discovery) | Service Discovery — Kubernetes DNS, Consul, Service Mesh | ✅ |
 
 ---
 
@@ -664,5 +665,51 @@ Each feature is a separate service deployed independently, communicating over th
 **Stay monolith when:** team is small, domain isn't well understood, or you can't afford the operational overhead.
 
 **SRE perspective:** microservices move complexity from code to infrastructure — more health checks, more tracing, more deployment pipelines. The SRE team feels this cost most.
+
+---
+
+## Day 13 — Service Discovery
+
+**Covered in:** [day13/README.md](day13/README.md)  
+**Reference:** [HTTP/2 in Go — go.dev/blog](https://go.dev/blog/h2push)
+
+Service Discovery answers: **"where is this service right now?"** Pod IPs change on every restart — callers can never hardcode them.
+
+---
+
+### Kubernetes DNS (CoreDNS)
+
+When you create a Kubernetes Service, CoreDNS automatically registers it:
+
+```
+config-service.default.svc.cluster.local → ClusterIP (stable)
+```
+
+The ClusterIP never changes. kube-proxy routes traffic from it to healthy pods. Callers just use the service name:
+
+```
+http://config-service/config   ← same namespace, short name works
+http://config-service.other-namespace.svc.cluster.local  ← cross-namespace
+```
+
+---
+
+### Other Patterns
+
+| Mechanism | Where used | How |
+|-----------|-----------|-----|
+| Kubernetes DNS | Kubernetes | DNS record per Service, kube-proxy routes to pods |
+| Consul | VM/bare metal | Service registry, client queries for IPs |
+| Service Mesh (Istio) | Kubernetes | Sidecar proxy handles discovery + routing + mTLS |
+| Environment variables | Simple k8s | Injected at pod start — stale if service changes |
+
+---
+
+### Common SRE Failure Modes
+
+- **DNS caching too aggressively** — app caches stale IP, pod behind it replaced
+- **Missing readiness probe** — pod registered in DNS before app is ready, first requests fail
+- **Cross-namespace short name** — resolves to wrong service or NXDOMAIN
+- **CoreDNS overload** — high pod churn overwhelms DNS, all service calls slow
 
 ---
