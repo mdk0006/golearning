@@ -35,7 +35,7 @@ Started: April 2026
 | [Day 11](day11/README.md) | Packages & Modules | API Gateway — single entry point pattern | [Organizing a Go module — go.dev/doc](https://go.dev/doc/modules/layout) | ✅ |
 | [Day 12](day12/README.md) | File I/O | Monolith vs Microservices — trade-offs | [Microservices — Martin Fowler](https://martinfowler.com/articles/microservices.html) | ✅ |
 | [Day 13](day13/README.md) | HTTP Client | Service Discovery — how services find each other | [HTTP/2 in Go — go.dev/blog](https://go.dev/blog/h2push) | ✅ |
-| Day 14 | HTTP Server | Load Balancer Deep Dive — L4 vs L7 | "Writing Web Apps in Go" — go.dev/doc |  |
+| [Day 14](day14/README.md) | HTTP Server | Load Balancer Deep Dive — L4 vs L7 | [Writing Web Applications in Go — go.dev/doc](https://go.dev/doc/articles/wiki/) | ✅ |
 | Day 15 | JSON | Consistent Hashing — distributed data routing | "JSON and Go" — go.dev/blog |  |
 | Day 16 | Closures & Variadic Functions | Replication — primary/replica, sync vs async | "Functional options in Go" — Dave Cheney |  |
 | Day 17 | Defer, Panic & Recover | Sharding — horizontal partitioning strategies | "Defer, Panic and Recover" — go.dev/blog |  |
@@ -80,7 +80,7 @@ Started: April 2026
 - [x] Day 11 — Packages & Modules
 - [x] Day 12 — File I/O
 - [x] Day 13 — HTTP Client
-- [ ] Day 14 — HTTP Server
+- [x] Day 14 — HTTP Server
 - [ ] Day 15 — JSON
 - [ ] Day 16 — Closures & Variadic Functions
 - [ ] Day 17 — Defer, Panic & Recover

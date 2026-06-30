@@ -20,6 +20,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 11](#day-11--api-gateway) | API Gateway — Single Entry Point Pattern | ✅ |
 | [Day 12](#day-12--monolith-vs-microservices) | Monolith vs Microservices — Trade-offs | ✅ |
 | [Day 13](#day-13--service-discovery) | Service Discovery — Kubernetes DNS, Consul, Service Mesh | ✅ |
+| [Day 14](#day-14--load-balancer-deep-dive) | Load Balancer Deep Dive — L4 vs L7 | ✅ |
 
 ---
 
@@ -711,5 +712,74 @@ http://config-service.other-namespace.svc.cluster.local  ← cross-namespace
 - **Missing readiness probe** — pod registered in DNS before app is ready, first requests fail
 - **Cross-namespace short name** — resolves to wrong service or NXDOMAIN
 - **CoreDNS overload** — high pod churn overwhelms DNS, all service calls slow
+
+---
+
+## Day 14 — Load Balancer Deep Dive: L4 vs L7
+
+**Covered in:** [day14/README.md](day14/README.md)  
+**Reference:** [Writing Web Applications in Go — go.dev/doc](https://go.dev/doc/articles/wiki/)
+
+---
+
+### L4 — Transport Layer (TCP/UDP)
+
+Routes by IP + port only. Never opens the packet to read content.
+
+- No SSL termination — encrypted bytes pass through
+- Works for any TCP protocol (HTTP, PostgreSQL, Redis, custom binary)
+- Extremely fast — no parsing overhead
+- Can't route by URL path, headers, or cookies
+
+**AWS:** Network Load Balancer (NLB)
+**Kubernetes:** `Service` of type `LoadBalancer` / `NodePort`
+
+---
+
+### L7 — Application Layer (HTTP)
+
+Terminates the client's TLS connection, reads the HTTP request, makes a new connection to the backend.
+
+- Path-based routing — `/api` → service A, `/static` → CDN
+- Host-based routing — `api.co` → backend A, `admin.co` → backend B
+- SSL termination — backends speak plain HTTP internally
+- Auth at the LB — validate tokens before requests reach services
+- Header manipulation, sticky sessions via cookies
+
+**AWS:** Application Load Balancer (ALB)
+**Kubernetes:** Ingress + Ingress Controller (Nginx, Traefik)
+
+---
+
+### Comparison
+
+| Feature | L4 (NLB) | L7 (ALB) |
+|---------|----------|----------|
+| Routes by | IP + port | URL, host, headers, cookies |
+| SSL termination | ❌ | ✅ |
+| Protocol support | Any TCP/UDP | HTTP, HTTPS, gRPC, WebSocket |
+| Speed | Faster | Slower (parsing overhead) |
+| Auth at LB | ❌ | ✅ |
+
+---
+
+### In Kubernetes
+
+```
+External traffic
+      ↓
+Ingress (L7) — path routing, TLS, host routing
+      ↓
+Service (L4) — distributes across pods
+      ↓
+Pod — your Go HTTP server on :8080
+```
+
+L7 for smart routing, L4 for pod-level distribution. They stack.
+
+### Health Checks
+
+L4 probe: TCP connect — accepts connection = healthy (doesn't check app logic).
+L7 probe: HTTP GET `/health` → must return 200. Your `handleHealth` handler is exactly what ALB, k8s liveness probes, and Consul call. Every service needs `/health`.
 
 ---
