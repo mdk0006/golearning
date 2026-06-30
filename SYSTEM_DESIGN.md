@@ -21,6 +21,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 12](#day-12--monolith-vs-microservices) | Monolith vs Microservices — Trade-offs | ✅ |
 | [Day 13](#day-13--service-discovery) | Service Discovery — Kubernetes DNS, Consul, Service Mesh | ✅ |
 | [Day 14](#day-14--load-balancer-deep-dive) | Load Balancer Deep Dive — L4 vs L7 | ✅ |
+| [Day 15](#day-15--consistent-hashing) | Consistent Hashing — Distributed Data Routing | ✅ |
 
 ---
 
@@ -781,5 +782,63 @@ L7 for smart routing, L4 for pod-level distribution. They stack.
 
 L4 probe: TCP connect — accepts connection = healthy (doesn't check app logic).
 L7 probe: HTTP GET `/health` → must return 200. Your `handleHealth` handler is exactly what ALB, k8s liveness probes, and Consul call. Every service needs `/health`.
+
+---
+
+## Day 15 — Consistent Hashing
+
+**Covered in:** [day15/README.md](day15/README.md)  
+**Reference:** [JSON and Go — go.dev/blog](https://go.dev/blog/json-and-go)
+
+When data is sharded across multiple nodes, you need a way to decide which node owns which key — and what happens to that mapping when nodes are added or removed.
+
+---
+
+### The Problem with Modulo Hashing
+
+```
+node = hash(key) % N
+```
+
+When `N` changes, almost every key remaps to a different node:
+
+```
+3 nodes → 4 nodes:
+  hash("web-01") % 3 = 1  →  hash("web-01") % 4 = 3  (moved!)
+```
+
+Adding one node to a 3-node Redis cluster can invalidate ~75% of the cache — a thundering herd hits the database simultaneously.
+
+---
+
+### Consistent Hashing
+
+Place both nodes and keys on a conceptual ring (0 to 2^32 − 1). A key belongs to the first node clockwise from its position.
+
+```
+Add a new node → only keys between the new node and its
+counter-clockwise neighbor remap. Everything else stays put.
+```
+
+Adding a node disturbs only `~1/N` of keys, not nearly all of them.
+
+---
+
+### Virtual Nodes
+
+Each physical node gets multiple virtual positions on the ring (100–500 typical) to smooth out uneven distribution that would otherwise occur with only a few hash points.
+
+---
+
+### Where It's Used
+
+| System | Use |
+|--------|-----|
+| Redis Cluster / Memcached | Shard ownership for keys |
+| DynamoDB / Cassandra | Partition placement |
+| CDNs (Akamai, Cloudflare) | Routes to correct edge cache node |
+| kube-proxy (IPVS mode) | Backend selection |
+
+**SRE question to ask:** when scaling a sharded system, "what happens to existing data when I add or remove a node?" If the answer is "almost everything moves," that's a modulo-hashing problem.
 
 ---
