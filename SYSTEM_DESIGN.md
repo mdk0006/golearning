@@ -22,6 +22,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 13](#day-13--service-discovery) | Service Discovery — Kubernetes DNS, Consul, Service Mesh | ✅ |
 | [Day 14](#day-14--load-balancer-deep-dive) | Load Balancer Deep Dive — L4 vs L7 | ✅ |
 | [Day 15](#day-15--consistent-hashing) | Consistent Hashing — Distributed Data Routing | ✅ |
+| [Day 16](#day-16--replication) | Replication — Primary/Replica, Sync vs Async | ✅ |
 
 ---
 
@@ -840,5 +841,77 @@ Each physical node gets multiple virtual positions on the ring (100–500 typica
 | kube-proxy (IPVS mode) | Backend selection |
 
 **SRE question to ask:** when scaling a sharded system, "what happens to existing data when I add or remove a node?" If the answer is "almost everything moves," that's a modulo-hashing problem.
+
+---
+
+## Day 16 — Replication
+
+**Covered in:** [day16/README.md](day16/README.md)  
+**Reference:** [Functional Options in Go — Dave Cheney](https://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis)
+
+Replication keeps copies of data on multiple nodes for durability, availability, and read scalability.
+
+---
+
+### Primary / Replica
+
+All writes go to the primary. Replicas receive a copy of the write log and apply it. Reads can be served from any replica.
+
+```
+Writes → Primary → replicates → Replica-1 (reads)
+                             → Replica-2 (reads)
+```
+
+---
+
+### Synchronous Replication
+
+Primary waits for replica to confirm receipt before acknowledging the client.
+
+- No data loss if primary crashes — data already on replica
+- Higher write latency — waits for network round trip
+- **Used for:** financial data, config changes, etcd
+
+---
+
+### Asynchronous Replication
+
+Primary acknowledges client immediately. Replication happens in background.
+
+- Possible data loss if primary crashes before replica receives write
+- Lower write latency — no waiting
+- **Used for:** metrics, analytics, read replicas, Prometheus remote write
+
+---
+
+### Replication Lag
+
+With async replication, replicas are always slightly behind — **replication lag**. Causes read-after-write inconsistency: write to primary, read from replica before it's caught up — stale data returned.
+
+**Fix:** route sensitive reads right after a write to the primary.
+
+---
+
+### Comparison
+
+| Property | Synchronous | Asynchronous |
+|----------|-------------|-------------|
+| Data loss on failure | None | Possible |
+| Write latency | Higher | Lower |
+| Replica lag | None | Seconds to minutes |
+
+---
+
+### Systems
+
+| System | Type |
+|--------|------|
+| etcd (Raft) | Sync — quorum required |
+| PostgreSQL | Configurable (sync or async) |
+| Redis Sentinel | Async |
+| Cassandra | Async, tunable per query |
+| Prometheus remote write | Async |
+
+**Failover:** when primary fails, a replica is promoted. Quorum prevents split-brain — a node can only become primary if the majority of nodes agree.
 
 ---
