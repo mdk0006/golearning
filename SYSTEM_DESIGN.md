@@ -23,6 +23,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 14](#day-14--load-balancer-deep-dive) | Load Balancer Deep Dive — L4 vs L7 | ✅ |
 | [Day 15](#day-15--consistent-hashing) | Consistent Hashing — Distributed Data Routing | ✅ |
 | [Day 16](#day-16--replication) | Replication — Primary/Replica, Sync vs Async | ✅ |
+| [Day 17](#day-17--sharding) | Sharding — Horizontal Partitioning Strategies | ✅ |
 
 ---
 
@@ -913,5 +914,78 @@ With async replication, replicas are always slightly behind — **replication la
 | Prometheus remote write | Async |
 
 **Failover:** when primary fails, a replica is promoted. Quorum prevents split-brain — a node can only become primary if the majority of nodes agree.
+
+---
+
+## Day 17 — Sharding
+
+**Covered in:** [day17/README.md](day17/README.md)  
+**Reference:** [Defer, Panic and Recover — go.dev/blog](https://go.dev/blog/defer-panic-and-recover)
+
+Sharding splits a large dataset across multiple nodes so no single node holds all the data. Scales writes and storage — replication scales reads.
+
+---
+
+### Why Shard?
+
+A single database node has limits — CPU, RAM, disk. When data grows beyond one machine, split it.
+
+```
+Users A–H → shard-1
+Users I–P → shard-2
+Users Q–Z → shard-3
+```
+
+---
+
+### Shard Key — Most Important Decision
+
+Determines which shard a record goes to. Bad key → hot spots (one shard does 90% of work).
+
+**Good shard key:** high cardinality, even distribution, immutable, appears in most queries.
+
+```
+Bad:  hash(created_at) % N  — all new records hit one shard
+Good: hash(user_id) % N     — random distribution
+```
+
+---
+
+### Strategies
+
+| Strategy | How | Trade-off |
+|----------|-----|-----------|
+| Range | Each shard owns a value range | Simple, but hot spots at boundaries |
+| Hash | `hash(key) % N` | Even distribution, resharding expensive |
+| Directory | Lookup table maps keys to shards | Flexible, but directory is a bottleneck |
+
+---
+
+### Cross-Shard Problem
+
+Joins and transactions across shards are expensive — must query multiple shards and join in application code. Design shard keys so related data lives on the same shard.
+
+---
+
+### Sharding vs Replication
+
+| | Sharding | Replication |
+|--|----------|-------------|
+| Scales | Writes + storage | Reads + availability |
+| Each node holds | Subset of data | All data |
+
+Real systems use both — each shard has its own replicas.
+
+---
+
+### Systems
+
+| System | Approach |
+|--------|---------|
+| Redis Cluster | 16,384 hash slots across nodes |
+| Cassandra | Consistent hash built-in |
+| MongoDB | Auto-sharding with configurable key |
+| Elasticsearch | Indices split into shards |
+| MySQL (Vitess) | Horizontal sharding layer |
 
 ---

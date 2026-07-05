@@ -38,7 +38,7 @@ Started: April 2026
 | [Day 14](day14/README.md) | HTTP Server | Load Balancer Deep Dive — L4 vs L7 | [Writing Web Applications in Go — go.dev/doc](https://go.dev/doc/articles/wiki/) | ✅ |
 | [Day 15](day15/README.md) | JSON | Consistent Hashing — distributed data routing | [JSON and Go — go.dev/blog](https://go.dev/blog/json-and-go) | ✅ |
 | [Day 16](day16/README.md) | Closures & Variadic Functions | Replication — primary/replica, sync vs async | [Functional Options in Go — Dave Cheney](https://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis) | ✅ |
-| Day 17 | Defer, Panic & Recover | Sharding — horizontal partitioning strategies | "Defer, Panic and Recover" — go.dev/blog |  |
+| [Day 17](day17/README.md) | Defer, Panic & Recover | Sharding — horizontal partitioning strategies | [Defer, Panic and Recover — go.dev/blog](https://go.dev/blog/defer-panic-and-recover) | ✅ |
 | Day 18 | Testing | Circuit Breaker — fail fast, prevent cascade | "The Go Blog: Table-driven tests" — go.dev/blog |  |
 | Day 19 | Structured Logging | Distributed Tracing — spans, traces, context | "Structured logging in Go" — go.dev/blog |  |
 | Day 20 | CLI Tool | Design a URL Shortener (end-to-end) | "How I built a CLI in Go" — Carolyn Van Slyck |  |
@@ -83,7 +83,7 @@ Started: April 2026
 - [x] Day 14 — HTTP Server
 - [x] Day 15 — JSON
 - [x] Day 16 — Closures & Variadic Functions
-- [ ] Day 17 — Defer, Panic & Recover
+- [x] Day 17 — Defer, Panic & Recover
 - [ ] Day 18 — Testing
 - [ ] Day 19 — Structured Logging
 - [ ] Day 20 — CLI Tool
