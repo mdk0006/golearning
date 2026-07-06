@@ -24,6 +24,7 @@ One topic per day — concept, how it works, SRE relevance, trade-offs.
 | [Day 15](#day-15--consistent-hashing) | Consistent Hashing — Distributed Data Routing | ✅ |
 | [Day 16](#day-16--replication) | Replication — Primary/Replica, Sync vs Async | ✅ |
 | [Day 17](#day-17--sharding) | Sharding — Horizontal Partitioning Strategies | ✅ |
+| [Day 18](#day-18--circuit-breaker) | Circuit Breaker — Fail Fast, Prevent Cascade | ✅ |
 
 ---
 
@@ -987,5 +988,67 @@ Real systems use both — each shard has its own replicas.
 | MongoDB | Auto-sharding with configurable key |
 | Elasticsearch | Indices split into shards |
 | MySQL (Vitess) | Horizontal sharding layer |
+
+---
+
+## Day 18 — Circuit Breaker
+
+**Covered in:** [day18/README.md](day18/README.md)  
+**Reference:** [Table-Driven Tests — go.dev/blog](https://go.dev/blog/subtests)
+
+Prevents a failing downstream service from cascading failures to callers.
+
+---
+
+### The Problem
+
+Without a circuit breaker, a slow service blocks all caller goroutines waiting for timeouts — the caller runs out of capacity and goes down too. One sick service takes down healthy services.
+
+---
+
+### Three States
+
+```
+CLOSED ──(failures > threshold)──► OPEN
+  ▲                                   │
+  │              HALF-OPEN ◄─(timeout)┘
+  └──(probe succeeds)──┘
+```
+
+**CLOSED** — normal operation. Requests pass through. Failure count tracked.
+
+**OPEN** — failing fast. All requests immediately return error. No network call made. Downstream gets time to recover.
+
+**HALF-OPEN** — probing recovery. Small number of requests allowed through. Success → CLOSED. Failure → OPEN again.
+
+---
+
+### What the Caller Sees
+
+```go
+result, err := cb.Call(func() (interface{}, error) {
+    return configService.Get("/config")
+})
+if err == ErrCircuitOpen {
+    return cachedConfig, nil   // fallback — use cached data
+}
+```
+
+When OPEN, caller gets fast error and can use fallback instead of waiting.
+
+---
+
+### SRE Impact
+
+| Without | With |
+|---------|------|
+| Slow service cascades | Failures contained |
+| Threads blocked waiting | Threads freed immediately |
+| Recovery takes minutes | Recovery detected in seconds (HALF-OPEN) |
+
+**Go:** `sony/gobreaker`, `afex/hystrix-go`
+**Istio/Envoy:** built-in circuit breaking at proxy level — no app code changes.
+
+**Circuit breaker + retry:** retry for transient failures, circuit breaker for sustained outages. Without circuit breaker, retries make cascades worse.
 
 ---
