@@ -40,8 +40,8 @@ Started: April 2026
 | [Day 16](day16/README.md) | Closures & Variadic Functions | Replication — primary/replica, sync vs async | [Functional Options in Go — Dave Cheney](https://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis) | ✅ |
 | [Day 17](day17/README.md) | Defer, Panic & Recover | Sharding — horizontal partitioning strategies | [Defer, Panic and Recover — go.dev/blog](https://go.dev/blog/defer-panic-and-recover) | ✅ |
 | [Day 18](day18/README.md) | Testing | Circuit Breaker — fail fast, prevent cascade | [Table-Driven Tests — go.dev/blog](https://go.dev/blog/subtests) | ✅ |
-| Day 19 | Structured Logging | Distributed Tracing — spans, traces, context | "Structured logging in Go" — go.dev/blog |  |
-| Day 20 | CLI Tool | Design a URL Shortener (end-to-end) | "How I built a CLI in Go" — Carolyn Van Slyck |  |
+| [Day 19](day19/README.md) | Structured Logging | Distributed Tracing — spans, traces, context | [Structured Logging in Go — go.dev/blog](https://go.dev/blog/slog) | ✅ |
+| [Day 20](day20/README.md) | CLI Tool | Design a URL Shortener (end-to-end) | [How I built a CLI in Go — Carolyn Van Slyck](https://carolynvanslyck.com/blog/2020/08/sting-of-the-viper/) | ✅ |
 
 ---
 
@@ -85,8 +85,8 @@ Started: April 2026
 - [x] Day 16 — Closures & Variadic Functions
 - [x] Day 17 — Defer, Panic & Recover
 - [x] Day 18 — Testing
-- [ ] Day 19 — Structured Logging
-- [ ] Day 20 — CLI Tool
+- [x] Day 19 — Structured Logging
+- [x] Day 20 — CLI Tool
 
 ### Month 3
 - [ ] Day 21 — Advanced Concurrency
