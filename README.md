@@ -49,7 +49,7 @@ Started: April 2026
 
 | Day | Go Topic | System Design | Article to Read | Status |
 |-----|----------|---------------|-----------------|--------|
-| Day 21 | `sync.WaitGroup`, `sync.Mutex` | Leader Election — Raft, ZooKeeper, etcd | "Share memory by communicating" — go.dev/blog |  |
+| [Day 21](day21/README.md) | `sync.WaitGroup`, `sync.Mutex` | Leader Election — Raft, ZooKeeper, etcd | [Share Memory By Communicating — go.dev/blog](https://go.dev/blog/codelab-share) | ✅ |
 | Day 22 | Context — timeout, cancellation | Event Sourcing & CQRS | "Go Concurrency Patterns: Context" — go.dev/blog |  |
 | Day 23 | Channels — select, fan-out, fan-in | Design a Notification System | "Go Concurrency Patterns: Pipelines" — go.dev/blog |  |
 | Day 24 | Kubernetes client-go | Design a Monitoring System | "Kubernetes client-go overview" — kubernetes.io/docs |  |
@@ -89,7 +89,7 @@ Started: April 2026
 - [x] Day 20 — CLI Tool
 
 ### Month 3
-- [ ] Day 21 — Advanced Concurrency
+- [x] Day 21 — Advanced Concurrency
 - [ ] Day 22 — Context
 - [ ] Day 23 — Channels Deep Dive
 - [ ] Day 24 — Kubernetes client-go
